@@ -69,4 +69,40 @@ class MemberJpaRepositoryTest {
         assertThat(result.get(0).getAge()).isEqualTo(20);
         assertThat(result.size()).isEqualTo(1);
     }
+
+    @Test
+    public void paging() {
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 10));
+        memberJpaRepository.save(new Member("member3", 10));
+        memberJpaRepository.save(new Member("member4", 10));
+        memberJpaRepository.save(new Member("member5", 10));
+        memberJpaRepository.save(new Member("member6", 10));
+
+        int age = 10;
+        int offset = 0;
+        int limit = 3;
+
+        List<Member> members = memberJpaRepository.findByPage(age, offset, limit);
+        long totalCount = memberJpaRepository.totalCount(age);
+
+        //페이징 계산 공식 적용 (이전 다음 페이지 있는지 없는지 계산)
+
+        assertThat(members.size()).isEqualTo(3);
+        assertThat(totalCount).isEqualTo(6);
+    }
+
+    @Test
+    public void bulkUpdate() {
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 14));
+        memberJpaRepository.save(new Member("member3", 11));
+        memberJpaRepository.save(new Member("member4", 16));
+        memberJpaRepository.save(new Member("member5", 13));
+        memberJpaRepository.save(new Member("member6", 17));
+
+        int resultCount = memberJpaRepository.bulkAgePlus(14);
+
+        assertThat(resultCount).isEqualTo(3);
+    }
 }
