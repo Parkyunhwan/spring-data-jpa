@@ -218,4 +218,25 @@ public class MemberRepositoryTest {
             System.out.println("team = " + member.getTeam());
         }
     }
+
+    @Test
+    public void queryHint() {
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush(); // 영속성컨텍스트 DB 동기화 발생
+        em.clear();
+
+        Member findMember = memberRepository.findReadOnlyByUsername(member1.getUsername());
+        findMember.setUsername("memberChange");
+        em.flush();
+    }
+
+    @Test
+    public void lock() {
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush(); // 영속성컨텍스트 DB 동기화 발생
+        em.clear();
+
+        List<Member> result = memberRepository.findLockByUsername(member1.getUsername());
+
+    }
 }
