@@ -242,6 +242,65 @@ public class MemberRepositoryTest {
 
     @Test
     public void callCustom() {
+
         List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
+
+    @Test
+    public void onlyUserName() {
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        memberRepository.save(new Member("member1", 10, teamA));
+        memberRepository.save(new Member("member2", 14, teamB));
+
+        em.flush();
+        em.clear();
+        List<UsernameOnly> member1 = memberRepository.findProjectionsByUsername("member1");
+
+        for (UsernameOnly usernameOnly : member1) {
+            System.out.println("usernameOnly = " + usernameOnly.getUsername());
+        }
+    }
+
+    @Test
+    public void nativeQuery() {
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        memberRepository.save(new Member("member1", 10, teamA));
+        memberRepository.save(new Member("member2", 14, teamB));
+
+        em.flush();
+        em.clear();
+        Member member = memberRepository.findByNativeQuery("member1");
+        System.out.println("member = " + member);
+    }
+
+    @Test
+    public void nativeProjectionQuery() {
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        memberRepository.save(new Member("member1", 10, teamA));
+        memberRepository.save(new Member("member2", 14, teamB));
+
+        em.flush();
+        em.clear();
+        Page<MemberProjection> result = memberRepository.findByNativeProjection(PageRequest.of(0, 10));
+        List<MemberProjection> content = result.getContent();
+        for (MemberProjection memberProjection : content) {
+            System.out.println("memberProjection.getUsername() = " + memberProjection.getUsername());
+            System.out.println("memberProjection.getTeamname() = " + memberProjection.getTeamname());
+        }
     }
 }
